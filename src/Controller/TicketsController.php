@@ -55,12 +55,8 @@ class TicketsController extends AppController
             $constraints['priorities'] = [intval($queryParams['priority'])];
         }
         if (!empty($queryParams['project'])) {
-            $filterPhids = [];
-            $filterProjects = ConduitHelper::callMethodSynchronous('project.search', ['constraints' => ['ids' => array_map('intval', explode(',', $queryParams['project'][0]))]]);
-            foreach ($filterProjects['data'] as $filterProject) {
-                $filterPhids[] = $filterProject['phid'];
-            }
-            $constraints['projects'] = $filterPhids;
+            $filterProjects = ConduitHelper::callMethodSynchronous('project.search', ['constraints' => ['ids' => [intval($queryParams['project'])]]]);
+            $constraints['projects'] = [$filterProjects['data'][0]['phid']];
         }
         if (!empty($queryParams['user'])) {
             $constraints['assigned'] = [$queryParams['user']];
