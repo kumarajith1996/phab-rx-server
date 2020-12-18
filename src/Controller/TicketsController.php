@@ -62,6 +62,9 @@ class TicketsController extends AppController
             }
             $constraints['projects'] = $filterPhids;
         }
+        if (!empty($queryParams['user'])) {
+            $constraints['assigned'] = [$queryParams['user']];
+        }
         $result = ConduitHelper::callMethodSynchronous('maniphest.search', ['attachments' => ['projects' => true], 'constraints' => $constraints]);
         $selectedOwners = [];
         $selectedProjects = [];
