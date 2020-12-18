@@ -21,13 +21,13 @@ class ProjectsController extends AppController
     public function index()
     {
         $projectData = ConduitHelper::callMethodSynchronous('project.search', ['order' => 'newest']);
-        $this->set(compact('projects'));
         $projects = [];
         foreach ($projectData['data'] as $project) {
             $projects[] = [
                 'id' => $project['id'],
                 'phid' => $project['phid'],
-                'name' => $project['fields']['name']
+                'name' => $project['fields']['name'],
+                'parent_name' => $project['fields']['parent']['name']
             ];
         }
         $this->set(compact('projects'));
