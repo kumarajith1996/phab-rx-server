@@ -87,7 +87,7 @@ $(function() {
             { name: 'id', title: "Id", type: "text", width: 150 },
             { name: 'name', title: 'Name', type: "text", width: 150 ,sorting: false},
             {name: 'description', title: 'Ticket Description', type: "text", width: 150, sorting: false},
-            { name: 'status', title: 'Status', type: "select",
+            { name: 'status', title: 'Status', sorter: "STATUS", type: "select",
                     itemTemplate: function(value, item) {
                         //console.log("asd", value, item);
                         return value;
@@ -103,6 +103,12 @@ $(function() {
 
             { type: "control" }
         ]
-    });
 
+    });
 });
+
+jsGrid.sortStrategies.STATUS = function(index1, index2) {
+    var status1 = STATUS[index1];
+    var status2 = STATUS[index2];
+    return status1.id.localeCompare(status2.id);
+};
