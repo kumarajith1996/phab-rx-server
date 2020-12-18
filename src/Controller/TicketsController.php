@@ -30,7 +30,8 @@ class TicketsController extends AppController
         'willFixLater' => 13,
         'wontfix' => 14,
         'invalid' => 15,
-        'Assess' => 1
+        'Assess' => 1,
+        'Open' => 0
     ];
 
     /**
@@ -53,6 +54,14 @@ class TicketsController extends AppController
         if (!empty($queryParams['priority'])) {
             $constraints['priorities'] = [intval($queryParams['priority'])];
         }
+        if (!empty($queryParams['project'])) {
+            $filterPhids = [];
+            $filterProjects = ConduitHelper::callMethodSynchronous('project.search', ['constraints' => ['ids' => array_map('intval', explode(',', $queryParams['project'][0]))]]);
+            foreach ($filterProjects['data'] as $filterProject) {
+                $filterPhids[] = $filterProject['phid'];
+            }
+            $constraints['projects'] = $filterPhids;
+        }
         $result = ConduitHelper::callMethodSynchronous('maniphest.search', ['attachments' => ['projects' => true], 'constraints' => $constraints]);
         $selectedOwners = [];
         $selectedProjects = [];
@@ -60,6 +69,7 @@ class TicketsController extends AppController
             $selectedOwners[] = $project['fields']['ownerPHID'] ?? '';
             $selectedProjects = array_merge($selectedProjects, $project['attachments']['projects']['projectPHIDs']);
         }
+        $selectedProjects = array_values(array_unique($selectedProjects));
         $projectMap = [];
         $ownerMap = [];
         if ($selectedProjects) {
@@ -88,7 +98,7 @@ class TicketsController extends AppController
                 'priority' => $project['fields']['priority']['name']
             ];
             foreach ($project['attachments']['projects']['projectPHIDs'] as $phid) {
-                $currentData['projects'][] = ['phid' => $phid, 'name' => $projectMap[$phid]];
+                $currentData['projects'][] = ['phid' => $phid, 'name' => $projectMap[$phid] ?? 'Restrict Project'];
             }
             $returnData[] = $currentData;
         }

@@ -22,6 +22,7 @@ class UsersTable extends Table
 		foreach($userDetails['data'] as $userDetails) {
             $responseData[] = [
             	'name' => $userDetails['fields']['realName'],
+            	'phid' => $userDetails['phid'],
             	'email' => $userDetails['fields']['username'] . '@zoomrx.com'
             ];
         }
