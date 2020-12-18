@@ -158,13 +158,13 @@ class TicketsController extends AppController
      *
      * @return \Cake\Http\Response|null
      */
-    public function editTickets()
+    public function edit()
     {
         $returnResults = ['objects' => [], 'transactions' => []];
         $errorMessages = [];
 
         $queryParams = $this->request->data;
-        $tickets = is_array($queryParams['tickets']) ? $queryParams['tickets']:[$queryParams['tickets']];
+        $tickets = isset($queryParams['tickets']) && is_array($queryParams['tickets']) ? $queryParams['tickets']:[$queryParams['id']];
         $transactions = [];
         if (!empty($queryParams['status'])) {
             $transactions[] = ['type' => 'status', 'value' => $queryParams['status']];
