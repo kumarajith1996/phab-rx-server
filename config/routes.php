@@ -91,6 +91,7 @@ Router::scope('/', function (RouteBuilder $routes) {
     $routes->fallbacks(DashedRoute::class);
     $routes->setExtensions(['json']);
     $routes->resources('Projects');
+    $routes->resources('Tickets');
     $routes->resources('Users');
 });
 
