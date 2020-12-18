@@ -20,21 +20,16 @@ class ProjectsController extends AppController
      */
     public function index()
     {
-        $result = ConduitHelper::callMethodSynchronous('maniphest.search', []);
-
-        $returnData = [];
-        foreach ($result['data'] as $project) {
-            $returnData[] = [
+        $projectData = ConduitHelper::callMethodSynchronous('project.search', ['order' => 'newest']);
+        $this->set(compact('projects'));
+        $projects = [];
+        foreach ($projectData['data'] as $project) {
+            $projects[] = [
                 'id' => $project['id'],
                 'phid' => $project['phid'],
-                'name' => $project['fields']['name'],
-                'description' => $project['fields']['description']['raw'],
-                'ownerPHID' => $project['fields']['ownerPHID'],
-                'status' => $project['fields']['status']['name'],
-                'priority' => $project['fields']['priority']['name']
+                'name' => $project['fields']['name']
             ];
         }
-
-        $this->set(compact('returnData'));
+        $this->set(compact('projects'));
     }
 }
