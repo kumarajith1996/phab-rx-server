@@ -39,9 +39,6 @@ class TicketsController extends AppController
             $projectMap[$project['phid']] = $project['fields']['name'];
         }
         $returnData = [];
-        Log::debug($result);
-        Log::debug($ownerMap);
-        Log::debug($projectMap);
         foreach ($result['data'] as $project) {
             $currentData = [
                 'id' => $project['id'],
@@ -60,5 +57,47 @@ class TicketsController extends AppController
         }
 
         $this->set(compact('returnData'));
+    }
+
+    /**
+     * Edit Ticket method
+     *
+     * @return \Cake\Http\Response|null
+     */
+    public function editTickets()
+    {
+        $returnResults = ['objects' => [], 'transactions' => []];
+        $errorMessages = [];
+        $tickets = [12236, 12237];
+        $status = 'Assess';
+        $owner = 'PHID-USER-7lrsjn2ijhidjjq472wl';
+        $sampleParam = [
+            'transactions' => [
+                [
+                    'type' => 'status',
+                    'value' => $status,
+                ],
+                [
+                    'type' => 'owner',
+                    'value' => $owner,
+                ],
+            ],
+            'objectIdentifier' => "",
+        ];
+        foreach ($tickets as $ticket) {
+            $sampleParam['objectIdentifier'] = $ticket;
+            try {
+                $currentResult = ConduitHelper::callMethodSynchronous(
+                    'maniphest.edit',
+                    $sampleParam
+                );
+                $returnResults['objects'][] = $currentResult['object'];
+                $returnResults['transactions'][] = $currentResult['transactions'];
+            } catch (\Exception $e) {
+                $errorMessages[] = $e->getMessage();
+            }
+        }
+        $returnValue = $errorMessages ?: $returnResults;
+        $this->set(compact('returnValue'));
     }
 }
