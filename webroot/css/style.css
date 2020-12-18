@@ -14,7 +14,23 @@ a {
 header {
     background: #2196F3;
     color: #fff;
-    padding: 10px 20px;
-    font-size: 30px;
+    padding: 6px 20px;
+    font-size: 24px;
+    height: 50px;
+}
+header a.home {
+    color: #fff;
+}
+header a.home:hover {
+    color: #EEE;
 }
 
+#all-tickets input[type="text"], #all-tickets select {
+    margin: 0;
+}
+
+
+
+.jsgrid-pager {
+    padding-left: 1em;
+}

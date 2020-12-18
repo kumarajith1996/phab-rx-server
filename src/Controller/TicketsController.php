@@ -20,7 +20,7 @@ class TicketsController extends AppController
      */
     public function index()
     {
-        $result = ConduitHelper::callMethodSynchronous('maniphest.search', ['attachments' => ['projects' => true], "limit"=> 10]);
+        $result = ConduitHelper::callMethodSynchronous('maniphest.search', ['attachments' => ['projects' => true]]);
         $selectedOwners = [];
         $selectedProjects = [];
         foreach ($result['data'] as $project) {
