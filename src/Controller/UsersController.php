@@ -20,14 +20,10 @@ class UsersController extends AppController
      */
     public function index()
     {
-        $api_token = "<api-token>";
-        $api_parameters = array();
-
-        $client = new ConduitClient('https://phab.zoomrx.com/');
-        $client->setConduitToken($api_token);
-
-        $result = $client->callMethodSynchronous('maniphest.priority.search', $api_parameters);
-        print_r($result);
+        $result = CurlRequest::sendJsonRequest([
+            'url' => 'https://phab.zoomrx.com/api/user.search?api.token=cli-r5c7qz2ecd7bxcdzikaxfx5nsosb',
+            'useTime' => 10
+        ]);
 
         $this->set(compact('result'));
     }
