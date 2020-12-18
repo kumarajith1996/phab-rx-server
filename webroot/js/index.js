@@ -72,7 +72,11 @@ $(function() {
     };
 
     var selectAllItems = function(item) {
-        selectedItems.push(item);
+
+    };
+
+    var selectAllItems = function(item) {
+
     };
 
     var unselectItem = function(item) {
@@ -103,9 +107,10 @@ $(function() {
         fields: [
             {
                 headerTemplate: function() {
-                    return $("<button>").attr("type", "button").text("All")
-                            .on("click", function () {
-                                selectAllItems();
+                    return $("<input>").attr("type", "checkbox").text("All")
+                            .prop ("checked", true)
+                            .on("change", function () {
+                                $(this).is(":checked") ? selectAllItems() : unselectAllItems();
                             });
                 },
                 itemTemplate: function(_, item) {
@@ -126,7 +131,7 @@ $(function() {
             { name: 'status', title: 'Status', sorter: "STATUS", type: "select",
                     itemTemplate: function(value, item) {
                         //console.log("asd", value, item);
-                        return value;
+                        return value.value;
                     },
                 items: STATUS, valueField: "id", textField: "value"
             },
