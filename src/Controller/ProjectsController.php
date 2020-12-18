@@ -2,8 +2,8 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use App\Zoomrx\Utility\ConduitHelper;
 use Cake\Log\Log;
-use App\Zoomrx\Utility\CurlRequest;
 
 /**
  * Projects Controller
@@ -20,13 +20,10 @@ class ProjectsController extends AppController
      */
     public function index()
     {
-        $result = CurlRequest::sendJsonRequest([
-            'url' => 'https://phab.zoomrx.com/api/maniphest.search?api.token=cli-r5c7qz2ecd7bxcdzikaxfx5nsosb',
-            'useTime' => 10
-        ]);
+        $result = ConduitHelper::callMethodSynchronous('maniphest.search', []);
 
         $returnData = [];
-        foreach ($result['result']['data'] as $project) {
+        foreach ($result['data'] as $project) {
             $returnData[] = [
                 'id' => $project['id'],
                 'phid' => $project['phid'],

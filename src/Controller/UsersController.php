@@ -3,7 +3,7 @@ namespace App\Controller;
 
 use App\Controller\AppController;
 use Cake\Log\Log;
-use App\Zoomrx\Utility\CurlRequest;
+use App\Zoomrx\Utility\ConduitHelper;
 /**
  * Users Controller
  *
@@ -19,12 +19,8 @@ class UsersController extends AppController
      * @return \Cake\Http\Response|null
      */
     public function index()
-    {
-        $result = CurlRequest::sendJsonRequest([
-            'url' => 'https://phab.zoomrx.com/api/user.search?api.token=cli-r5c7qz2ecd7bxcdzikaxfx5nsosb',
-            'useTime' => 10
-        ]);
-
+    { 
+        $result = ConduitHelper::callMethodSynchronous('user.search', []);
         $this->set(compact('result'));
     }
 }
