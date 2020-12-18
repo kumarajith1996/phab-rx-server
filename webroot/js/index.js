@@ -1,23 +1,25 @@
 var STATUS = [
-    {id: 0, value: 'Open' , name: 'open'},
-    {id: 1, value: 'Assess' , name: 'assess'},
-    {id: 2, value: 'In Progress' , name: 'inProgress'},
-    {id: 3, value: 'Code Review' , name: 'codeReview'},
-    {id: 4, value: 'Unit Testing' , name: 'unitTesting'},
-    {id: 5, value: 'Fixed' , name: 'fixed'},
-    {id: 6, value: 'Ready For QA Testing' , name: 'readyForQATesting'},
-    {id: 7, value: 'Quality Assurance Testing' , name: 'qaTesting'},
-    {id: 8, value: 'Quality Assurance Completed' , name: 'qaCompleted'},
-    {id: 9, value: 'User Acceptance Testing' , name: 'userAcceptanceTesting'},
-    {id: 10, value: 'Ready To Release' , name: 'readyToRelease'},
-    {id: 11, value: 'Resolved' , name: 'resolved'},
-    {id: 12, value: 'Not reproducible' , name: 'notReproducible'},
-    {id: 13, value: 'Will fix later' , name: 'willFixLater'},
-    {id: 14, value: 'Will not fix' , name: 'wontfix'},
-    {id: 15, value: 'Invalid' , name: 'invalid'}
+    {id: '', value: '' , name: ''},
+    {id: 'open', value: 'Open' , name: 'open'},
+    {id: 'assess', value: 'Assess' , name: 'assess'},
+    {id: 'inProgress', value: 'In Progress' , name: 'inProgress'},
+    {id: 'codeReview', value: 'Code Review' , name: 'codeReview'},
+    {id: 'unitTesting', value: 'Unit Testing' , name: 'unitTesting'},
+    {id: 'fixed', value: 'Fixed' , name: 'fixed'},
+    {id: 'readyForQATesting', value: 'Ready For QA Testing' , name: 'readyForQATesting'},
+    {id: 'qaTesting', value: 'Quality Assurance Testing' , name: 'qaTesting'},
+    {id: 'qaCompleted', value: 'Quality Assurance Completed' , name: 'qaCompleted'},
+    {id: 'userAcceptanceTesting', value: 'User Acceptance Testing' , name: 'userAcceptanceTesting'},
+    {id: 'readyToRelease', value: 'Ready To Release' , name: 'readyToRelease'},
+    {id: 'resolved', value: 'Resolved' , name: 'resolved'},
+    {id: 'notReproducible', value: 'Not reproducible' , name: 'notReproducible'},
+    {id: 'willFixLater', value: 'Will fix later' , name: 'willFixLater'},
+    {id: 'wontfix', value: 'Will not fix' , name: 'wontfix'},
+    {id: 'invalid', value: 'Invalid' , name: 'invalid'}
 ]
 
 var PRIORITY = [
+  {id: '', value: '' , name: ''},
   {id: 80, value: '80' , name: 'High'},
   {id: 50, value: '50' , name: 'Medium'},
   {id: 25, value: '25' , name: 'Low'},
@@ -64,7 +66,7 @@ $(function() {
         }
     }
     var selectedItems = [];
- 
+
     var selectItem = function(item) {
         selectedItems.push(item);
     };
@@ -72,13 +74,13 @@ $(function() {
     var selectAllItems = function(item) {
         selectedItems.push(item);
     };
- 
+
     var unselectItem = function(item) {
         selectedItems = $.grep(selectedItems, function(i) {
             return i !== item;
         });
     };
- 
+
     $("#all-tickets").jsGrid({
         height: "calc( 100% - 50px)",
         width: "100%",
@@ -95,7 +97,7 @@ $(function() {
         pageButtonCount: 5,
 
         controller: db,
-        rowClick: function(args) { 
+        rowClick: function(args) {
             console.log("sdf", args);
         },
         fields: [
@@ -126,7 +128,7 @@ $(function() {
                         //console.log("asd", value, item);
                         return value;
                     },
-                items: STATUS, valueField: "id", textField: "value" 
+                items: STATUS, valueField: "id", textField: "value"
             },
             { name: 'priority', title: 'Priority', type: "select",
                     itemTemplate: function(value, item) {
