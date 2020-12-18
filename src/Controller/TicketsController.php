@@ -164,7 +164,7 @@ class TicketsController extends AppController
         $errorMessages = [];
 
         $queryParams = $this->request->data;
-        $tickets = isset($queryParams['tickets']) && is_array($queryParams['tickets']) ? $queryParams['tickets']:[$queryParams['id']];
+        $tickets = isset($queryParams['tickets']) && is_array($queryParams['tickets']) ? $queryParams['tickets']:(isset($queryParams['id']) ? [$queryParams['id']]:[$queryParams['tickets']]);
         $transactions = [];
         if (!empty($queryParams['status'])) {
             $transactions[] = ['type' => 'status', 'value' => $queryParams['status']];
@@ -200,5 +200,25 @@ class TicketsController extends AppController
         }
         $returnValue = $errorMessages ?: $returnResults;
         $this->set(compact('returnValue'));
+        if (isset($queryParams['id'])) {
+            $updatedTicketDetails = ConduitHelper::callMethodSynchronous(
+                'maniphest.info',
+                [
+                    'task_id' => $queryParams['id']
+                ]
+            );
+            $this->set(compact('updatedTicketDetails'));
+        } else {
+            $updatedTicketDetails = [];
+            foreach ($tickets as $ticket) {
+                $updatedTicketDetails[] = ConduitHelper::callMethodSynchronous(
+                    'maniphest.info',
+                    [
+                        'task_id' => $ticket
+                    ]
+                );
+            }
+            $this->set(compact('updatedTicketDetails'));
+        }
     }
 }
