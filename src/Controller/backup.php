@@ -153,9 +153,11 @@ class TicketsController extends AppController
     {
         $returnResults = ['objects' => [], 'transactions' => []];
         $errorMessages = [];
+        $tickets = [12235, 12239];
+        $status = 'In Progress';
+        $owner = 'PHID-USER-7lrsjn2ijhidjjq472wl';
 
-        $queryParams = $this->request->data;
-        $tickets = is_array($queryParams['tickets']) ? $queryParams['tickets']:[$queryParams['tickets']];
+        $queryParams = $this->request->query();
         $transactions = [];
         if (!empty($queryParams['status'])) {
             $transactions[] = ['type' => 'status', 'value' => $queryParams['status']];
@@ -164,18 +166,39 @@ class TicketsController extends AppController
             $transactions[] = ['type' => 'owner', 'value' => $queryParams['owner']];
         }
         if (!empty($queryParams['add_projects'])) {
-            $add_projects = is_array($queryParams['add_projects']) ? $queryParams['add_projects']:[$queryParams['add_projects']];
-            $transactions[] = ['type' => 'projects.add', 'value' => $add_projects];
+            $transactions[] = ['type' => 'projects.add', 'value' => $queryParams['add_projects']];
         }
         if (!empty($queryParams['remove_projects'])) {
-            $remove_projects = is_array($queryParams['remove_projects']) ? $queryParams['remove_projects']:[$queryParams['remove_projects']];
-            $transactions[] = ['type' => 'projects.remove', 'value' => $remove_projects];
+            $transactions[] = ['type' => 'projects.remove', 'value' => $queryParams['remove_projects']];
         }
 
         $apiParams = [
             "transactions" => $transactions,
             'objectIdentifier' => "",
         ];
+        Log::debug($apiParams);
+        $apiParams = [
+            'transactions' => [
+                [
+                    'type' => 'status',
+                    'value' => $status,
+                ],
+                [
+                    'type' => 'owner',
+                    'value' => $owner,
+                ],
+                [
+                    'type' => 'projects.add',
+                    'value' => '$add_projects'
+                ],
+                [
+                    'type' => 'projects.remove',
+                    'value' => '$remove_projects'
+                ]
+            ],
+            'objectIdentifier' => "",
+        ];
+        Log::debug($apiParams);
         foreach ($tickets as $ticket) {
             $apiParams['objectIdentifier'] = $ticket;
             try {
