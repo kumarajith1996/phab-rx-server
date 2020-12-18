@@ -108,7 +108,7 @@ $(function() {
             {
                 headerTemplate: function() {
                     return $("<input>").attr("type", "checkbox").text("All")
-                            .prop ("checked", true)
+                            .prop ("checked", $(this).prop('checked'))
                             .on("change", function () {
                                 $(this).is(":checked") ? selectAllItems() : unselectAllItems();
                             });
@@ -125,17 +125,17 @@ $(function() {
                 width: 50
 
             },
-            { name: 'id', title: "Id", type: "text", width: 30, editing: false},
-            { name: 'name', title: 'Name', type: "text", width: 150 ,sorting: false},
-            {name: 'description', title: 'Ticket Description', type: "text", width: 150, sorting: false},
-            { name: 'status', title: 'Status', sorter: "STATUS", type: "select",
+            { name: 'id', title: "Id", type: "text", width: 30, editing: false, filtering: false},
+            { name: 'name', title: 'Name', type: "text", width: 150 ,sorting: false, filtering: true},
+            {name: 'description', title: 'Ticket Description', type: "text", width: 150, sorting: false, filtering:true},
+            { name: 'status', title: 'Status', sorter: "STATUS",filtering:true, type: "select",
                     itemTemplate: function(value, item) {
                         //console.log("asd", value, item);
                         return value.value;
                     },
                 items: STATUS, valueField: "id", textField: "value"
             },
-            { name: 'priority', title: 'Priority', type: "select",
+            { name: 'priority', title: 'Priority', filtering:true, type: "select",
                     itemTemplate: function(value, item) {
                         //console.log("asd", value, item);
                         return value;
