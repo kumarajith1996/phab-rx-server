@@ -13,6 +13,26 @@ use Cake\Log\Log;
  */
 class TicketsController extends AppController
 {
+    const STATUS_MAP = [
+        'open' => 0,
+        'assess' => 1,
+        'inProgress' => 2,
+        'codeReview' => 3,
+        'unitTesting' => 4,
+        'fixed' => 5,
+        'readyForQATesting' => 6,
+        'qaTesting' => 7,
+        'qaCompleted' => 8,
+        'userAcceptanceTesting' => 9,
+        'readyToRelease' => 10,
+        'resolved' => 11,
+        'notReproducible' => 12,
+        'willFixLater' => 13,
+        'wontfix' => 14,
+        'invalid' => 15,
+        'Assess' => 1
+    ];
+
     /**
      * Index method
      *
@@ -20,24 +40,41 @@ class TicketsController extends AppController
      */
     public function index()
     {
-        $result = ConduitHelper::callMethodSynchronous('maniphest.search', ['attachments' => ['projects' => true]]);
+        $queryParams = $this->request->query();
+        $constraints = [];
+        if (!empty($queryParams['name'])) {
+            $constraints['query'] = $queryParams['name'];
+        } elseif (!empty($queryParams['description'])) {
+            $constraints['query'] = $queryParams['description'];
+        }
+        if (!empty($queryParams['status'])) {
+            $constraints['statuses'] = [$queryParams['status']];
+        }
+        if (!empty($queryParams['priority'])) {
+            $constraints['priorities'] = [intval($queryParams['priority'])];
+        }
+        $result = ConduitHelper::callMethodSynchronous('maniphest.search', ['attachments' => ['projects' => true], 'constraints' => $constraints]);
         $selectedOwners = [];
         $selectedProjects = [];
         foreach ($result['data'] as $project) {
             $selectedOwners[] = $project['fields']['ownerPHID'] ?? '';
             $selectedProjects = array_merge($selectedProjects, $project['attachments']['projects']['projectPHIDs']);
         }
-        // $selectedProjects = array_unique($selectedProjects);
-        $projects = ConduitHelper::callMethodSynchronous('project.search', ['constraints' => ['phids' => $selectedProjects]]);
-        $owners = ConduitHelper::callMethodSynchronous('user.search', ['constraints' => ['phids' => $selectedOwners]]);
-        $ownerMap = [];
         $projectMap = [];
-        foreach ($owners['data'] as $owner) {
-            $ownerMap[$owner['phid']] = $owner['fields']['username'];
+        $ownerMap = [];
+        if ($selectedProjects) {
+            $projects = ConduitHelper::callMethodSynchronous('project.search', ['constraints' => ['phids' => $selectedProjects]]);
+            foreach ($projects['data'] as $project) {
+                $projectMap[$project['phid']] = $project['fields']['name'];
+            }
         }
-        foreach ($projects['data'] as $project) {
-            $projectMap[$project['phid']] = $project['fields']['name'];
+        if ($selectedOwners) {
+            $owners = ConduitHelper::callMethodSynchronous('user.search', ['constraints' => ['phids' => $selectedOwners]]);
+            foreach ($owners['data'] as $owner) {
+                $ownerMap[$owner['phid']] = $owner['fields']['username'];
+            }
         }
+        
         $returnData = [];
         foreach ($result['data'] as $project) {
             $currentData = [
@@ -47,7 +84,7 @@ class TicketsController extends AppController
                 'description' => $project['fields']['description']['raw'],
                 'owner' => $ownerMap[$project['fields']['ownerPHID']] ?? '',
                 'ownerPHID' => $project['fields']['ownerPHID'],
-                'status' => $project['fields']['status']['name'],
+                'status' => ['value' => $project['fields']['status']['name'], 'name' => $project['fields']['status']['value'], 'id' => self::STATUS_MAP[$project['fields']['status']['value']]],
                 'priority' => $project['fields']['priority']['name']
             ];
             foreach ($project['attachments']['projects']['projectPHIDs'] as $phid) {
@@ -57,6 +94,54 @@ class TicketsController extends AppController
         }
 
         $this->set(compact('returnData'));
+    }
+
+    private function _identifyOwner($ticketPHID, $newStatus) 
+    {
+        $ticketDetails = ConduitHelper::callMethodSynchronous('maniphest.search', ['constraints' => ['phids' => [$ticketPHID]], "limit"=> 1]);
+        $ticketDetails = $ticketDetails['data'][0];
+        $oldStatus = $ticketDetails['fields']['status']['value'];
+        $transactionDetails = ConduitHelper::callMethodSynchronous('transaction.search', ['objectIdentifier' => $ticketPHID]);
+        $tracingStatus = $oldStatus;
+        $tracingOwner = $ticketDetails['fields']['ownerPHID'];
+        $expectedState = '';
+        if ($oldStatus == 'codeReview') {
+            $expectedState = 'unitTesting';
+        } elseif ($oldStatus == 'qaTesting') {
+            $expectedState = 'fixed';
+        } elseif ($oldStatus == 'userAcceptanceTesting' && $newStatus == 'readyToRelease') {
+            $expectedState = 'qaCompleted';
+        } elseif ($oldStatus == 'userAcceptanceTesting' && $newStatus == 'qaTesting') {
+            $expectedState = 'qaTesting';
+        }
+
+        $ownerChanged = false;
+        $expectedStateReached = false;
+        foreach ($transactionDetails['data'] as $transaction) {
+            if (!in_array($transaction['type'], ["owner", "status"])) {
+                continue;
+            }
+            if ($transaction['type'] == "status") {
+                if ($transaction['fields']['old'] == $expectedState) {
+                    $expectedStateReached = true;
+                    if ($ownerChanged) {
+                        break;
+                    }
+                } elseif ($expectedStateReached) {
+                    break;
+                }
+            }
+            if ($transaction['type'] == "owner") {
+                if ($transaction['fields']['old'] != $ticketDetails['fields']['ownerPHID']) {
+                    $ownerChanged = true;
+                    $tracingOwner = $transaction['fields']['old'];
+                    if ($expectedStateReached) {
+                        break;
+                    }
+                }
+            }
+        }
+        return $tracingOwner != $ticketDetails['fields']['ownerPHID'] ? $tracingOwner : '';
     }
 
     /**
