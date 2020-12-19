@@ -236,7 +236,7 @@ $(function() {
             var priorityValue = PRIORITY.find(function(priority){
                       return priority.id == item.priority;
                     })
-            var $status = $("<td colspan='2' width='100'>").append($("<span>").attr("class", "ticket-status").html(statusValue && statusValue.value || "Unknown Status"),$("<span>").attr("class", "ticket-priority").html(priorityValue && priorityValue.name || ""));
+            var $status = $("<td colspan='2' width='100'>").append($("<span>").attr("class", "ticket-status").html(statusValue && statusValue.value || "Unknown Status"),$("<span>").attr("class", "ticket-priority prio-"+item.priority).append($('<i class="fa fa-exclamation-circle" aria-hidden="true">'), priorityValue && priorityValue.name || ""));
 
 
             var action = [];

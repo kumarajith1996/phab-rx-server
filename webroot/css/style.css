@@ -63,7 +63,6 @@ header a.home:hover {
 .ticket-status {
     padding: 4px 10px;
     background: #efefef;
-    border: 1px solid #e0e0e0;
     margin-right: 7px;
     border-radius: 20px;
     margin-bottom: 3px;
@@ -82,11 +81,13 @@ padding: 2px 7px;
     margin-top: 10px;
 }
 .ticket-priority {
-    padding: 4px 10px;
-    background: #efefef;
+    padding: 2px 8px;
     border: 1px solid #e0e0e0;
     border-radius: 20px;
     display: inline-block;
+}
+.ticket-priority i {
+    margin-right: 5px;
 }
 #all-tickets .jsgrid-button.jsgrid-edit-button {
     padding: 15px;
@@ -177,3 +178,22 @@ padding: 6px 10px;
   color: #fff;
 }
 
+
+.prio-80 i {
+  color: #c0392b
+}
+
+.prio-50 i {
+  color: #e67e22
+}
+
+.prio-25 i {
+  color: #f1c40f
+}
+
+.prio-90 i {
+  color: #8e44ad;
+}
+.prio-0 i {
+  color: #3498db;
+}
