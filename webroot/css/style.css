@@ -145,3 +145,35 @@ padding: 6px 10px;
 .conform-user-box .cancel-button:hover {
   background: #aaa;
 }
+#bulk-editor {
+      position: fixed;
+  background: #2196f3;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+  display: none;
+    padding: 12px;
+}
+#bulk-editor label {
+    color: #fff;
+  display: inline-block;
+}
+#bulk-editor .divi {
+    display: inline-block;
+}
+#bulk-editor select {
+    display: inline-block;
+    margin-bottom: 0px;
+}
+#bulk-editor button {
+  display: inline-block;
+  background: #fff;
+  color: #000;    
+  float: right;
+}
+#bulk-editor button.cancel {
+      background: transparent;
+  border: 1px solid #fff;
+  color: #fff;
+}
+

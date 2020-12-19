@@ -3,13 +3,15 @@
 <head>
 	<title>PhabRx</title>
 	<meta name="viewport" content="width=device-width">
+	<script src="js/jquery.min.js"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 	<link href='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css' rel='stylesheet' type='text/css'>
 	<link rel="stylesheet" type="text/css" href="css/jsgrid-theme.min.css">
 	<link rel="stylesheet" type="text/css" href="css/jsgrid.min.css">
 	<link rel="stylesheet" type="text/css" href="css/base.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css">
-	<script src="js/jquery.min.js"></script>
 	<script src='https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js'></script>
 	<script src="js/jsgrid.min.js"></script>
 </head>
@@ -21,9 +23,10 @@
 	<script src="js/index.js"></script>
 	<br>
 	<div id="bulk-editor">
-		<div style="width:100%;">
+		<div class="divi">
 			<label>Status</label>
-			<select name="bulkStatus" id="bulkStatus" style="display:inline-block;width: 25%">
+			<select name="bulkStatus" id="bulkStatus" style="width: 200px">
+				<option value="">Choose Status...</option>
 				<option value="open">Open</option>
 				<option value="assess">Assess</option>
 				<option value="inProgress">In Progress</option>
@@ -41,19 +44,20 @@
 				<option value="wontfix">Will not fix</option>
 				<option value="invalid">Invalid</option>
 			</select>
-			<button id="bulkStatusUpdate" class='action-button' style="display:inline-block;"> Bulk edit status</button>
 		</div>
-		<div style="width:100%;">
-			<label>Status</label>
-			<select name="bulkPrio" id="bulkPrio" style="display:inline-block;width: 25%">
+		<div class="divi" style="margin-left: 20px;">
+			<label>Priority</label>
+			<select name="bulkPrio" id="bulkPrio" style="display:inline-block;width: 150px;">
+				<option value="">Choose Priority...</option>
 				<option value="wish">Wishlist</option>
 				<option value="low">Low</option>
 				<option value="medium">Medium</option>
 				<option value="high">High</option>
 				<option value="triage">Needs Triage</option>
 			</select>
-			<button id="bulkPrioUpdate" class='action-button' style="display:inline-block;"> Bulk edit priority</button>
 		</div>
+		<button id="bulkDataUpdate" class='action-button' style="display:inline-block;"> Bulk Update</button>
+		<button id="cancelBulkDataUpdate" class='action-button cancel' style="display:inline-block;"> Cancel</button>
 	</div>
 </body>
 </html>

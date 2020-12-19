@@ -48,12 +48,12 @@ $(function() {
             return $.ajax({
                 type: "GET",
                 url: "tickets.json",
-                data: filter
+                data: Object.assign(filter,{project:'881'})
             }).then((data)=> {
                 hideBulkEditArea()
                 hideLoading()
                 return data.returnData;
-            });
+            })
         },
 
         insertItem: function(item) {
@@ -112,7 +112,9 @@ $(function() {
             return i !== item;
         });
         if (selectedItems.length > 1) {
-            showBulkEditArea()
+            showBulkEditArea();
+        } else {
+            hideBulkEditArea();
         }
     };
 
@@ -139,31 +141,28 @@ $(function() {
             hideLoading(); 
         });
     }
-
-    $('#bulkStatusUpdate').on('click', function() {
-        showLoading();
-        var postData = {
-            'tickets': selectedItems.map(a => a.id),
-            'status': $("#bulkStatus option:selected").val()
-        }
-
-        $.ajax({
-            type: "POST",
-            url: "tickets/edit.json",
-            data: postData
-        }).then((responseData)=> {
-            // console.log("succ", responseData);
-            $("#all-tickets").jsGrid("render");
-        }).catch((error)=> {
-            hideLoading(); 
-        });
+    $('#cancelBulkDataUpdate').on('click', function() {
+        hideBulkEditArea();
+         $("#bulkStatus").val("");
+        $("#bulkPrio").val("");
+        unselectAllItems();
     });
+    
 
-    $('#bulkPrioUpdate').on('click', function() {
+    $('#bulkDataUpdate').on('click', function() {
         showLoading();
         var postData = {
-            'tickets': selectedItems.map(a => a.id),
-            'priority': $("#bulkPrio option:selected").val()
+            'tickets': selectedItems.map(a => a.id)
+        }
+
+        var bulkStatus = $("#bulkStatus option:selected");
+        var bulkPrio = $("#bulkPrio option:selected");
+
+        if (bulkStatus.val()) {
+            postData['status'] = bulkStatus.val()
+        }
+        if (bulkPrio.val()) {
+            postData['priority'] = bulkPrio.val()
         }
 
         $.ajax({
@@ -171,8 +170,10 @@ $(function() {
             url: "tickets/edit.json",
             data: postData
         }).then((responseData)=> {
-            // console.log("succ", responseData);
             $("#all-tickets").jsGrid("render");
+            $("#bulkStatus").val("");
+            $("#bulkPrio").val("");
+            toastr.info('Successfully Updated.');
         }).catch((error)=> {
             hideLoading(); 
         });
