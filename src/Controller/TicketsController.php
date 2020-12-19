@@ -86,6 +86,7 @@ class TicketsController extends AppController
         
         $returnData = [];
         foreach ($result['data'] as $project) {
+            
             $currentData = [
                 'id' => $project['id'],
                 'phid' => $project['phid'],
@@ -93,8 +94,8 @@ class TicketsController extends AppController
                 'description' => $project['fields']['description']['raw'],
                 'owner' => $ownerMap[$project['fields']['ownerPHID']] ?? '',
                 'ownerPHID' => $project['fields']['ownerPHID'],
-                'status' => ['value' => $project['fields']['status']['name'], 'name' => $project['fields']['status']['value'], 'id' => self::STATUS_MAP[$project['fields']['status']['value']]],
-                'priority' => $project['fields']['priority']['name']
+                'status' => $project['fields']['status']['value'],
+                'priority' => $project['fields']['priority']['value']
             ];
             foreach ($project['attachments']['projects']['projectPHIDs'] as $phid) {
                 $currentData['projects'][] = ['phid' => $phid, 'name' => $projectMap[$phid] ?? 'Restrict Project'];

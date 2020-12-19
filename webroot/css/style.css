@@ -34,3 +34,114 @@ header a.home:hover {
 .jsgrid-pager {
     padding-left: 1em;
 }
+
+.ticket-id {
+    margin-left: 4px;
+    margin-right: 13px;
+}
+.ticket-name {
+    margin-right: 10px;
+}
+.ticket-description {
+    display: block;
+    margin-top: 5px;
+    color: #909090;
+    padding: 3px 4px;
+    height: 24px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+.ticket-description.expanded {
+    height: auto;
+    overflow: auto;
+    white-space: unset;
+    cursor: default;
+    text-overflow: initial;
+}
+.ticket-status {
+    padding: 4px 10px;
+    background: #efefef;
+    border: 1px solid #e0e0e0;
+    margin-right: 7px;
+    border-radius: 20px;
+    margin-bottom: 3px;
+    display: inline-block;
+}
+.ticket-owner {
+padding: 2px 7px;
+  border-radius: 10px;
+  background: #f1f1f1;
+  color: #353535;
+}
+.ticket-owner i {
+    margin-right: 4px;
+}
+.ticket-associate {
+    margin-top: 10px;
+}
+.ticket-priority {
+    padding: 4px 10px;
+    background: #efefef;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    display: inline-block;
+}
+#all-tickets .jsgrid-button.jsgrid-edit-button {
+    padding: 15px;
+    margin-top: 9px;
+    margin-bottom: 0px;
+    margin: 10px 6px -6px;
+    float: right;
+}
+.action-button {
+    padding: 7px 10px;
+    border-radius: 4px;
+    margin: 4px 6px;
+}
+.conform-user-box {
+  position: absolute;
+  z-index: 1;
+  padding: 16px 20px;
+  right: 4px;
+  top: 4px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+.conform-user-box .close-icon{
+  position: absolute;
+}
+.conform-user-box .invisible-box {
+    background: rgb(255 255 255 / 90%);
+    top: 0px;
+    position: absolute;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    border-radius: 10px;
+}
+.conform-user-box .action-button {
+padding: 6px 10px;
+  vertical-align: middle;
+  background: #009688;
+  font-size: 13px;
+}
+.conform-user-box .action-button:hover, .conform-user-box .action-button:focus {
+  background-color: #0c867a;
+}
+.conform-user-box:before {
+  content: "";
+  position: fixed;
+  background: rgb(0 0 0 / 27%);
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+}
+.conform-user-box .cancel-button {
+  background: #797979;
+}
+.conform-user-box .cancel-button:hover {
+  background: #aaa;
+}
