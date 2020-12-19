@@ -95,7 +95,8 @@ class TicketsController extends AppController
                 'owner' => $ownerMap[$project['fields']['ownerPHID']] ?? '',
                 'ownerPHID' => $project['fields']['ownerPHID'],
                 'status' => $project['fields']['status']['value'],
-                'priority' => $project['fields']['priority']['value']
+                'priority' => $project['fields']['priority']['value'],
+                'projects'=> []
             ];
             foreach ($project['attachments']['projects']['projectPHIDs'] as $phid) {
                 $currentData['projects'][] = ['phid' => $phid, 'name' => $projectMap[$phid] ?? 'Restrict Project'];
@@ -106,12 +107,12 @@ class TicketsController extends AppController
         $this->set(compact('returnData'));
     }
 
-    private function _identifyOwner($ticketPHID, $newStatus) 
+    private function _identifyOwner($id, $newStatus) 
     {
-        $ticketDetails = ConduitHelper::callMethodSynchronous('maniphest.search', ['constraints' => ['phids' => [$ticketPHID]], "limit"=> 1]);
+        $ticketDetails = ConduitHelper::callMethodSynchronous('maniphest.search', ['constraints' => ['ids' => [intval($id)]], "limit"=> 1]);
         $ticketDetails = $ticketDetails['data'][0];
         $oldStatus = $ticketDetails['fields']['status']['value'];
-        $transactionDetails = ConduitHelper::callMethodSynchronous('transaction.search', ['objectIdentifier' => $ticketPHID]);
+        $transactionDetails = ConduitHelper::callMethodSynchronous('transaction.search', ['objectIdentifier' => $ticketDetails['phid']]);
         $tracingStatus = $oldStatus;
         $tracingOwner = $ticketDetails['fields']['ownerPHID'];
         $expectedState = '';
@@ -170,8 +171,17 @@ class TicketsController extends AppController
         if (!empty($queryParams['status'])) {
             $transactions[] = ['type' => 'status', 'value' => $queryParams['status']];
         }
+        if (!empty($queryParams['priority'])) {
+            $transactions[] = ['type' => 'priority', 'value' => $queryParams['priority']];
+        }
         if (!empty($queryParams['owner'])) {
             $transactions[] = ['type' => 'owner', 'value' => $queryParams['owner']];
+        } elseif (count($tickets) == 1) {
+            $owner = $this->_identifyOwner($tickets[0], $queryParams['status']);
+            Log::debug('Reassigning back to ' . $owner);
+            if ($owner) {
+                $transactions[] = ['type' => 'owner', 'value' => $owner];
+            }
         }
         if (!empty($queryParams['add_projects'])) {
             $add_projects = is_array($queryParams['add_projects']) ? $queryParams['add_projects']:[$queryParams['add_projects']];

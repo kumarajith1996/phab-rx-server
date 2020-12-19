@@ -35,9 +35,14 @@ function hideLoading() {
     $('.jsgrid-load-shader').hide();
     $('.jsgrid-load-panel').hide();
 }
+
+function showBulkEditArea() {
+    $('#bulk-editor').show();
+}
+function hideBulkEditArea() {
+    $('#bulk-editor').hide();
+}
 $(function() {
-
-
     var db = {
         loadData: function(filter) {
             return $.ajax({
@@ -45,6 +50,8 @@ $(function() {
                 url: "tickets.json",
                 data: filter
             }).then((data)=> {
+                hideBulkEditArea()
+                hideLoading()
                 return data.returnData;
             });
         },
@@ -77,20 +84,33 @@ $(function() {
 
     var selectItem = function(item) {
         selectedItems.push(item);
+        if (selectedItems.length > 1) {
+            showBulkEditArea()
+        }
     };
 
     var selectAllItems = function(item) {
-
+        let allData = $("#all-tickets").jsGrid("option", "data");
+        let pageSize = $("#all-tickets").jsGrid("option", "pageSize");
+        let pageIndex = $("#all-tickets").jsGrid("option", "pageIndex");
+        selectedItems = allData.slice((pageIndex - 1) * pageSize, pageIndex * pageSize)
+        $('input:checkbox').prop('checked', true)
+        showBulkEditArea()
     };
 
-    var selectAllItems = function(item) {
-
+    var unselectAllItems = function(item) {
+        $('input:checkbox').prop('checked', false)
+        selectedItems = []
+        hideBulkEditArea()
     };
 
     var unselectItem = function(item) {
         selectedItems = $.grep(selectedItems, function(i) {
             return i !== item;
         });
+        if (selectedItems.length > 1) {
+            showBulkEditArea()
+        }
     };
 
     var changeStatus = function(item, data, id, owner) {
@@ -109,13 +129,51 @@ $(function() {
             url: "tickets/edit.json",
             data: postData
         }).then((responseData)=> {
-            console.log("succ", responseData);
+            // console.log("succ", responseData);
             $(".conform-user-box").remove();
             $("#all-tickets").jsGrid("render");
         }).catch((error)=> {
             hideLoading(); 
         });
     }
+
+    $('#bulkStatusUpdate').on('click', function() {
+        showLoading();
+        var postData = {
+            'tickets': selectedItems.map(a => a.id),
+            'status': $("#bulkStatus option:selected").val()
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "tickets/edit.json",
+            data: postData
+        }).then((responseData)=> {
+            // console.log("succ", responseData);
+            $("#all-tickets").jsGrid("render");
+        }).catch((error)=> {
+            hideLoading(); 
+        });
+    });
+
+    $('#bulkPrioUpdate').on('click', function() {
+        showLoading();
+        var postData = {
+            'tickets': selectedItems.map(a => a.id),
+            'priority': $("#bulkPrio option:selected").val()
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "tickets/edit.json",
+            data: postData
+        }).then((responseData)=> {
+            // console.log("succ", responseData);
+            $("#all-tickets").jsGrid("render");
+        }).catch((error)=> {
+            hideLoading(); 
+        });
+    });
 
     $("#all-tickets").jsGrid({
         height: "calc( 100% - 50px)",
@@ -133,8 +191,11 @@ $(function() {
         pageButtonCount: 5,
 
         controller: db,
+        onPageChanged: function(args) {
+            unselectAllItems()
+        },
         rowClick: function(args) {
-            console.log("sdf", args);
+            // console.log("sdf", args);
         },
         rowRenderer: function(item) {
             //var $photo = $("<div>").addClass("client-photo").append($("<img>").attr("src", user.picture.large));
@@ -210,7 +271,7 @@ $(function() {
                 break;
                 
                 case 'qaCompleted':
-                action = [{name: "userAcceptanceTesting", title: 'User Acceptance Testing', assign: true}, {name: "qaCompleted", title: 'Verified'}];
+                action = [{name: "userAcceptanceTesting", title: 'User Acceptance Testing', assign: true}, {name: "readyToRelease", title: 'Verified'}];
                 break;
 
                 case 'userAcceptanceTesting':
@@ -221,7 +282,7 @@ $(function() {
                 action = [{name: "resolved", title: 'Completed'}];
                 break;
             }
-            console.log(action);
+            // console.log(action);
             var $actions = [];
             action.forEach(function(obj) {
                 $actions.push($("<button>").attr('class', 'action-button').html(obj.title)
@@ -250,7 +311,7 @@ $(function() {
                                     };
                                    },
                                    processResults: function (response) {
-                                    console.log(response.responseData);
+                                    // console.log(response.responseData);
                                     var users = [];
                                     response.responseData.forEach(function(user) {
                                         users.push({id:user.phid, text:user.name})

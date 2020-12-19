@@ -19,5 +19,41 @@
 </header>
 	<div id="all-tickets"></div>
 	<script src="js/index.js"></script>
+	<br>
+	<div id="bulk-editor">
+		<div style="width:100%;">
+			<label>Status</label>
+			<select name="bulkStatus" id="bulkStatus" style="display:inline-block;width: 25%">
+				<option value="open">Open</option>
+				<option value="assess">Assess</option>
+				<option value="inProgress">In Progress</option>
+				<option value="codeReview">Code Review</option>
+				<option value="unitTesting">Unit Testing</option>
+				<option value="fixed">Fixed</option>
+				<option value="readyForQATesting">Ready For QA</option>
+				<option value="qaTesting">Quality Assurance Testing</option>
+				<option value="qaCompleted">Quality Assurance Completed</option>
+				<option value="userAcceptanceTesting">User Acceptance Testing</option>
+				<option value="readyToRelease">Ready To Release</option>
+				<option value="resolved">Resolved</option>
+				<option value="notReproducible">Not reproducible</option>
+				<option value="willFixLater">Will fix later</option>
+				<option value="wontfix">Will not fix</option>
+				<option value="invalid">Invalid</option>
+			</select>
+			<button id="bulkStatusUpdate" class='action-button' style="display:inline-block;"> Bulk edit status</button>
+		</div>
+		<div style="width:100%;">
+			<label>Status</label>
+			<select name="bulkPrio" id="bulkPrio" style="display:inline-block;width: 25%">
+				<option value="wish">Wishlist</option>
+				<option value="low">Low</option>
+				<option value="medium">Medium</option>
+				<option value="high">High</option>
+				<option value="triage">Needs Triage</option>
+			</select>
+			<button id="bulkPrioUpdate" class='action-button' style="display:inline-block;"> Bulk edit priority</button>
+		</div>
+	</div>
 </body>
 </html>
