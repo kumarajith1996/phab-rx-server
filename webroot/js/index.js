@@ -69,6 +69,9 @@ $(function() {
                 type: "PUT",
                 url: "tickets/edit.json",
                 data: item
+            }).then((data)=> {
+                console.log(data);
+                return data.updatedTicketDetails[0];
             });
         },
 
@@ -263,7 +266,7 @@ $(function() {
                 break;
                 
                 case 'readyForQATesting':
-                action = [{name: "userAcceptanceTesting", title: 'Assing To Other QA', assign: true}, {name: "userAcceptanceTesting", title: 'Own it'}];
+                action = [{name: "qaTesting", title: 'Assing To Other QA', assign: true}, {name: "qaTesting", title: 'Own it'}];
                 break;
                 
                 case 'qaTesting':

@@ -34,6 +34,14 @@ class TicketsController extends AppController
         'Open' => 0
     ];
 
+    const PRIO_MAP = [
+        0 => 'wish',
+        25 => 'low',
+        50 => 'medium',
+        80 => 'high',
+        90 => 'triage'
+    ];
+
     /**
      * Index method
      *
@@ -54,6 +62,7 @@ class TicketsController extends AppController
         if (!empty($queryParams['priority'])) {
             $constraints['priorities'] = [intval($queryParams['priority'])];
         }
+        $queryParams['project'] = '881';
         if (!empty($queryParams['project'])) {
             $filterProjects = ConduitHelper::callMethodSynchronous('project.search', ['constraints' => ['ids' => [intval($queryParams['project'])]]]);
             $constraints['projects'] = [$filterProjects['data'][0]['phid']];
@@ -61,6 +70,14 @@ class TicketsController extends AppController
         if (!empty($queryParams['user'])) {
             $constraints['assigned'] = [$queryParams['user']];
         }
+        
+        $returnData = $this->_fetchTicketData($constraints);
+
+        $this->set(compact('returnData'));
+    }
+
+    private function _fetchTicketData($constraints, $edit = false) 
+    {
         $result = ConduitHelper::callMethodSynchronous('maniphest.search', ['attachments' => ['projects' => true], 'constraints' => $constraints]);
         $selectedOwners = [];
         $selectedProjects = [];
@@ -85,8 +102,7 @@ class TicketsController extends AppController
         }
         
         $returnData = [];
-        foreach ($result['data'] as $project) {
-            
+        foreach ($result['data'] as $project) {    
             $currentData = [
                 'id' => $project['id'],
                 'phid' => $project['phid'],
@@ -103,8 +119,7 @@ class TicketsController extends AppController
             }
             $returnData[] = $currentData;
         }
-
-        $this->set(compact('returnData'));
+        return $edit ? $returnData[0] : $returnData;
     }
 
     private function _identifyOwner($id, $newStatus) 
@@ -172,10 +187,14 @@ class TicketsController extends AppController
             $transactions[] = ['type' => 'status', 'value' => $queryParams['status']];
         }
         if (!empty($queryParams['priority'])) {
-            $transactions[] = ['type' => 'priority', 'value' => $queryParams['priority']];
+            $priorityValue = $queryParams['priority'];
+            if (filter_var($priorityValue, FILTER_VALIDATE_INT)) {
+                $priorityValue = self::PRIO_MAP[intval($priorityValue)];
+            }
+            $transactions[] = ['type' => 'priority', 'value' => $priorityValue];
         }
         if (!empty($queryParams['owner'])) {
-            $transactions[] = ['type' => 'owner', 'value' => $queryParams['owner']];
+            $transactions[] = ['type' => 'owner', 'value' => $queryParams['ownerPHID'] ?? $queryParams['owner']];
         } elseif (count($tickets) == 1) {
             $owner = $this->_identifyOwner($tickets[0], $queryParams['status']);
             Log::debug('Reassigning back to ' . $owner);
@@ -212,24 +231,10 @@ class TicketsController extends AppController
         $returnValue = $errorMessages ?: $returnResults;
         $this->set(compact('returnValue'));
         if (isset($queryParams['id'])) {
-            $updatedTicketDetails = ConduitHelper::callMethodSynchronous(
-                'maniphest.info',
-                [
-                    'task_id' => $queryParams['id']
-                ]
-            );
-            $this->set(compact('updatedTicketDetails'));
+            $updatedTicketDetails = $this->_fetchTicketData(['ids' => [intval($queryParams['id'])]]);
         } else {
-            $updatedTicketDetails = [];
-            foreach ($tickets as $ticket) {
-                $updatedTicketDetails[] = ConduitHelper::callMethodSynchronous(
-                    'maniphest.info',
-                    [
-                        'task_id' => $ticket
-                    ]
-                );
-            }
-            $this->set(compact('updatedTicketDetails'));
+            $updatedTicketDetails = $this->_fetchTicketData(['ids' => array_map('intval', $queryParams['tickets'])]);
         }
+        $this->set(compact('updatedTicketDetails'));
     }
 }
